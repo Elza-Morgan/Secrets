@@ -4,8 +4,8 @@ const express = require("express");
 const ejs = require("ejs");
 const bodyParser= require("body-parser");
 const mongoose = require("mongoose");
-const bcrypt = require('bcrypt'); 
-const saltRounds = 10;
+// const bcrypt = require('bcrypt'); 
+// const saltRounds = 10;
 
 var md5 = require('md5');
 
@@ -46,41 +46,41 @@ app.get('/register', function(req,res){
 
 app.post("/register", function(req,res){
 
-    bcrypt.hash(req.body.password, saltRounds).then(function(hash){
-        const newUser = new User ({
-            email: req.body.username,
-            password: hash
-        });
-        newUser.save().then(function(){
-            res.render("secrets");
-        }).catch(function(err){
-            console.log(err);
-        });
-    }).catch(function(err){
-        console.log(err);
-    });
+    // bcrypt.hash(req.body.password, saltRounds).then(function(hash){
+    //     const newUser = new User ({
+    //         email: req.body.username,
+    //         password: hash
+    //     });
+    //     newUser.save().then(function(){
+    //         res.render("secrets");
+    //     }).catch(function(err){
+    //         console.log(err);
+    //     });
+    // }).catch(function(err){
+    //     console.log(err);
+    // });
 });
 
 
 app.post("/login", function(req,res){
 
-const userName = req.body.username;
-const password = req.body.password;
+// const userName = req.body.username;
+// const password = req.body.password;
 
-User.findOne({email : userName }).then(function(foundUser){
+// User.findOne({email : userName }).then(function(foundUser){
 
-    bcrypt.compare(password, foundUser.password).then(function(result){
+//     bcrypt.compare(password, foundUser.password).then(function(result){
 
-        if(result === true){
-                res.render("secrets");
-        }
+//         if(result === true){
+//                 res.render("secrets");
+//         }
         
-    }).catch(function(err){
+//     }).catch(function(err){
 
-    });
-}).catch(function(err){
-    console.log(err);
-});
+//     });
+// }).catch(function(err){
+//     console.log(err);
+// });
 
 
 
