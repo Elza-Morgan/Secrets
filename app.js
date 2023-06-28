@@ -35,7 +35,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/userDB", {useNewUrlParser:true});
 const userSchema = new mongoose.Schema ({
     email: String,
     password: String,
-    googleId: String
+    googleId: String,
+    secret: String
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -108,50 +109,17 @@ app.get("/auth/google",
     res.redirect("/secrets");
   });
 
-
-
-
-
-
-
-
-app.get("/secrets",function (req,res){
-
-if(req.isAuthenticated()){  //if authentication is true then it will enter the "if-statment"
-    res.render("secrets");
-}else{
-    res.redirect("/login");
-}
-
-});
-
 app.get('/login', function(req,res){
-
     res.render("login");
-
 });
 
-app.get("/logout", function(req,res){
 
-    req.logout(function(err){
-        if(err){
-            console.log(err);
-        }else{
-            res.redirect("/");
-        }
-    });
-   
-
-});
 
 app.get('/register', function(req,res){
-
     res.render("register");
-
 });
 
 app.post("/register", function(req,res){
-
    User.register({username: req.body.username}, req.body.password).then(function(){
     passport.authenticate("local")(req,res,function(){
         res.redirect("/secrets");
@@ -160,8 +128,61 @@ app.post("/register", function(req,res){
     console.log(err);
     res.redirect("/register");
    });   
+});
+
+app.get("/secrets",function (req,res){
+
+    //{$ne:null} mean "not equal to null"
+    User.find({"secret": {$ne:null}}).then((foundusers)=>{
+        if(foundusers){
+            res.render("secrets", {usersWithSecrets: foundusers});
+        }
+
+    }).catch((err)=>{
+        console.log(err);
+    });
+    
+});
+
+app.get("/submit",(req,res)=>{
+
+    if(req.isAuthenticated()){  //if authentication is true then it will enter the "if-statment"
+        res.render("submit");
+    }else{
+        res.redirect("/login");
+    }
+
+});
+
+app.post("/submit", (req,res) =>{
+
+    const submittedSecrete= req.body.secret;
+    console.log(req.user.id);
+
+    User.findById(req.user.id).then((founduser)=>{
+
+            if(founduser){
+                    founduser.secret = submittedSecrete;
+                    founduser.save().then(()=>{
+                        res.redirect("/secrets");
+                    }).catch((err)=>{
+                        console.log(err);
+                    });
+            }
+    }).catch((err)=>{
+        console.log(err);
+    });
+});
 
 
+app.get("/logout", function(req,res){
+    req.logout(function(err){
+        if(err){
+            console.log(err);
+        }else{
+            res.redirect("/");
+        }
+    });
 });
 
 
